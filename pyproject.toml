@@ -3,5 +3,11 @@ name = "branch-and-price-gurobi"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = []
+requires-python = ">=3.9,<3.10"
+dependencies = [
+    "gurobipy==9.1.2",
+    "numpy==1.21.2",
+    "bidict==0.21.3",
+    "networkx==2.6.3",
+    "matplotlib==3.4.3",
+]
