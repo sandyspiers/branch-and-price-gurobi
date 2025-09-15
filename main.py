@@ -22,13 +22,13 @@ def main():
                             level=logging.INFO)
 
         parser = argparse.ArgumentParser(description="Solves machine assignment problem.")
-        parser.add_argument('data_set. See branch-and-price/src/input_data/general_assignment_problem.py '
-                            'for details of each data set.',
+        parser.add_argument('data_set',
                             choices=['example_applied_integer_programming',
                                      'exercise_applied_integer_programming',
                                      'small_example',
                                      'medium_example'],
-                            help='Name of data set.')
+                            help='Name of data set. See branch-and-price/src/input_data/general_assignment_problem.py '
+                                 'for details of each data set.')
 
         parser.add_argument('--method',
                             choices=['standalone', 'branch_and_price', 'both'],
