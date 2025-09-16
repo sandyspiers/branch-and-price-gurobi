@@ -3,6 +3,7 @@ File contains implementation of full model of GAP
 and it is expected to serve as a verification that
 branch and price returns the correct results.
 """
+
 import logging
 from collections import defaultdict
 from typing import Tuple, Dict, Collection
@@ -16,9 +17,9 @@ from bidict import bidict
 
 class GAPStandaloneModel:
 
-    def __init__(self,
-                 model: grb.Model,
-                 assignment_to_variable: bidict[Tuple[int, int], grb.Var]):
+    def __init__(
+        self, model: grb.Model, assignment_to_variable: bidict[Tuple[int, int], grb.Var]
+    ):
         self.mip_model = model
         self._assignment_to_variable = assignment_to_variable
 
@@ -28,7 +29,7 @@ class GAPStandaloneModel:
 
     def write(self):
         model_name = self.mip_model.getAttr(grb.GRB.Attr.ModelName)
-        self.mip_model.write(f'{model_name}.lp')
+        self.mip_model.write(f"{model_name}.lp")
 
     def report_results(self):
         obj_val = self.mip_model.getAttr(grb.GRB.Attr.ObjVal)
@@ -50,4 +51,4 @@ class GAPStandaloneModel:
             tasks = machine_to_tasks[machine]
             logging.info(f'{machine}\t{" ".join([str(task) for task in tasks])}')
 
-        logging.info('')
+        logging.info("")

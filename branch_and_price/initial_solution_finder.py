@@ -20,7 +20,9 @@ class InitialSolutionFinder:
         self.gap_instance = gap_instance
 
         # current assignment - machine to
-        self.solution: Dict[int, Set[int]] = dict((machine, set()) for machine in range(self.gap_instance.num_machines))
+        self.solution: Dict[int, Set[int]] = dict(
+            (machine, set()) for machine in range(self.gap_instance.num_machines)
+        )
 
         # array specifying whether task is used or not
         self.used_tasks = np.full(self.gap_instance.num_tasks, False)
@@ -34,8 +36,7 @@ class InitialSolutionFinder:
         self._report()
 
         return [
-            (machine_id, list(tasks))
-            for machine_id, tasks in self.solution.items()
+            (machine_id, list(tasks)) for machine_id, tasks in self.solution.items()
         ]
 
     def _initial_assignment(self):
@@ -62,21 +63,29 @@ class InitialSolutionFinder:
 
             # Add tasks nodes
             bipartite_graph.add_nodes_from(
-                [f't-{task_id}' for task_id in unassigned_tasks],
-                bipartite=task_node_group_ind
+                [f"t-{task_id}" for task_id in unassigned_tasks],
+                bipartite=task_node_group_ind,
             )
 
             # Add machine nodes
             bipartite_graph.add_nodes_from(
-                [f'm-{machine_id}' for machine_id in range(self.gap_instance.num_machines)],
-                bipartite=machine_group_node_ind
+                [
+                    f"m-{machine_id}"
+                    for machine_id in range(self.gap_instance.num_machines)
+                ],
+                bipartite=machine_group_node_ind,
             )
 
             bipartite_graph.add_weighted_edges_from(
-                (f't-{task_id}', f'm-{machine_id}', self.gap_instance.weight(task_id=task_id, machine_id=machine_id))
+                (
+                    f"t-{task_id}",
+                    f"m-{machine_id}",
+                    self.gap_instance.weight(task_id=task_id, machine_id=machine_id),
+                )
                 for task_id in unassigned_tasks
                 for machine_id in range(self.gap_instance.num_machines)
-                if self.gap_instance.weight(task_id=task_id, machine_id=machine_id) <= self.remaining_capacity[machine_id]
+                if self.gap_instance.weight(task_id=task_id, machine_id=machine_id)
+                <= self.remaining_capacity[machine_id]
             )
 
             assert nx.is_bipartite(bipartite_graph)
@@ -86,7 +95,7 @@ class InitialSolutionFinder:
 
             def _unwrap(assignment) -> Tuple[int, int]:
                 first, second = assignment
-                if first[0] == 't':
+                if first[0] == "t":
                     return int(first[2:]), int(second[2:])
                 else:
                     return int(second[2:]), int(first[2:])
@@ -149,7 +158,7 @@ class InitialSolutionFinder:
         # 4. Continue until no remaining tasks
         # The question is whether a procedure guarantees to finish.
         # Potential cycles?
-        solution_found = (np.sum(self.used_tasks) == self.gap_instance.num_tasks)
+        solution_found = np.sum(self.used_tasks) == self.gap_instance.num_tasks
         while not solution_found:
             task = self._select_unassigned_task()
             machine = self._select_machine(task)
@@ -163,7 +172,7 @@ class InitialSolutionFinder:
             self._free_capacity(machine, weight)
             self._assign(machine, task)
 
-            solution_found = (np.sum(self.used_tasks) == self.gap_instance.num_tasks)
+            solution_found = np.sum(self.used_tasks) == self.gap_instance.num_tasks
 
     def _verify_solution_feasibility(self):
         feasible = True
@@ -172,7 +181,9 @@ class InitialSolutionFinder:
         for machine, tasks in self.solution.items():
             allocated_weight = 0
             for task in tasks:
-                allocated_weight += self.gap_instance.weight(task_id=task, machine_id=machine)
+                allocated_weight += self.gap_instance.weight(
+                    task_id=task, machine_id=machine
+                )
 
                 if used_tasks[task] is True:
                     logging.error(f"Task {task} assigned to two machines.")
@@ -185,8 +196,12 @@ class InitialSolutionFinder:
 
             feasible = allocated_weight <= self.gap_instance.capacity[machine]
             if not feasible:
-                logging.error("Solution not feasible for machine {%d} - allocated weight {%f} > capacity {%f}",
-                              machine, allocated_weight, self.gap_instance.machine_capacity(machine))
+                logging.error(
+                    "Solution not feasible for machine {%d} - allocated weight {%f} > capacity {%f}",
+                    machine,
+                    allocated_weight,
+                    self.gap_instance.machine_capacity(machine),
+                )
                 break
 
         if not feasible:
@@ -201,7 +216,9 @@ class InitialSolutionFinder:
         tot_profit = 0
         logging.info(" * Initial feasible solution")
         for machine, tasks in self.solution.items():
-            tot_profit += np.sum(self.gap_instance.profits[machine, task] for task in tasks)
+            tot_profit += np.sum(
+                self.gap_instance.profits[machine, task] for task in tasks
+            )
             s = "\t{}: {}".format(machine, " ".join([str(task) for task in tasks]))
             logging.info(s)
         logging.info(" ** Associated profit: {}".format(tot_profit))

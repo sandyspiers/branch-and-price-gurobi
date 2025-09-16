@@ -9,7 +9,7 @@ class BranchingRule:
     (1) A task must be assigned to a machine.
     (2) A task must not be assigned to a machine.
     """
-    
+
     task: int
     machine: int
     # indicator variable specifying whether

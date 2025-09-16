@@ -19,9 +19,7 @@ class GAPBranchAndPrice:
         self.tree = nx.DiGraph()
 
     def solve(self):
-        queue: Queue[BranchNode] = Queue([
-            self._create_root_node()
-        ])
+        queue: Queue[BranchNode] = Queue([self._create_root_node()])
 
         best_solution_node = None
         mip_lb = None
@@ -35,11 +33,17 @@ class GAPBranchAndPrice:
             current_node.solve()
 
             if not current_node.is_feasible():
-                logging.info("[BAP] Solution at node {} is infeasible.".format(current_node.id))
+                logging.info(
+                    "[BAP] Solution at node {} is infeasible.".format(current_node.id)
+                )
                 continue
 
             if current_node.has_integer_solution():
-                logging.info("[B&P] Solution at node {} has integer solution.".format(current_node.id))
+                logging.info(
+                    "[B&P] Solution at node {} has integer solution.".format(
+                        current_node.id
+                    )
+                )
                 obj = current_node.objective_value()
                 current_node.report_solution()
                 if mip_lb is None or obj > mip_lb:
@@ -47,7 +51,11 @@ class GAPBranchAndPrice:
                     mip_lb = obj
             else:
                 obj = current_node.objective_value()
-                logging.info("[B&P] Solution at node %d has non integer solution. Obj %.1f", current_node.id, obj)
+                logging.info(
+                    "[B&P] Solution at node %d has non integer solution. Obj %.1f",
+                    current_node.id,
+                    obj,
+                )
                 if nodes := self._branch(current_node, mip_lb):
                     include_nd, exclude_nd = nodes
                     queue.push(include_nd)
@@ -58,7 +66,8 @@ class GAPBranchAndPrice:
 
         try:
             from networkx.drawing.nx_pydot import pydot_layout
-            pos = pydot_layout(self.tree, prog='dot')
+
+            pos = pydot_layout(self.tree, prog="dot")
         except (ImportError, Exception):
             pos = nx.spring_layout(self.tree)
         nx.draw(self.tree, pos, with_labels=True, arrows=True)
@@ -72,11 +81,13 @@ class GAPBranchAndPrice:
         return BranchNode(
             gap_instance=self.gap_instance,
             branching_rules=branching_rules,
-            machine_schedules=initial_solution
+            machine_schedules=initial_solution,
         )
 
     @classmethod
-    def _branch(cls, node: BranchNode, mip_lb: float) -> Optional[Tuple[BranchNode, BranchNode]]:
+    def _branch(
+        cls, node: BranchNode, mip_lb: float
+    ) -> Optional[Tuple[BranchNode, BranchNode]]:
         """
         Branches based on results from `node`. It obtains non-integers
         variable from solution to `node` and associated machine and task.
@@ -98,7 +109,11 @@ class GAPBranchAndPrice:
 
         # based on current solution obtain id of task and machine
         machine, task = node.machine_task_to_branch_on()
-        logging.info("[BAP] Current node {}. Branching on machine {} and task {}".format(node.id, machine, task))
+        logging.info(
+            "[BAP] Current node {}. Branching on machine {} and task {}".format(
+                node.id, machine, task
+            )
+        )
 
         # create two branching rules
         exclude_branching = BranchingRule(task, machine, assigned=False)

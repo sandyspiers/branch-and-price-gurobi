@@ -11,10 +11,9 @@ class Subproblem:
     Knapsack problem.
     """
 
-    def __init__(self,
-                 machine_id: int,
-                 model: grb.Model,
-                 task_to_variable: bidict[int, grb.Var]):
+    def __init__(
+        self, machine_id: int, model: grb.Model, task_to_variable: bidict[int, grb.Var]
+    ):
 
         self.machine_id = machine_id
         self._model = model
@@ -23,9 +22,9 @@ class Subproblem:
 
     def solve(self):
         self._model.optimize()
-        self._objective_value = self._model.ObjVal \
-            if has_solution(self._model.status) \
-            else None
+        self._objective_value = (
+            self._model.ObjVal if has_solution(self._model.status) else None
+        )
 
     def objective_value(self) -> Optional[float]:
         return self._objective_value

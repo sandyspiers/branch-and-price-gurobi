@@ -9,10 +9,12 @@ from common import TMachineSchedule, is_non_zero
 
 class DantzigWolfeFormulationGapStandaloneModel:
 
-    def __init__(self,
-                 dw_model: grb.Model,
-                 machine_schedule_idx_to_variable: bidict[int, grb.Var],
-                 feasible_machine_schedules: List[TMachineSchedule]):
+    def __init__(
+        self,
+        dw_model: grb.Model,
+        machine_schedule_idx_to_variable: bidict[int, grb.Var],
+        feasible_machine_schedules: List[TMachineSchedule],
+    ):
         self.dw_model = dw_model
         self.feasible_machine_schedules = feasible_machine_schedules
         self.machine_schedule_idx_to_variable = machine_schedule_idx_to_variable
@@ -23,12 +25,14 @@ class DantzigWolfeFormulationGapStandaloneModel:
 
     def write(self):
         model_name = self.dw_model.getAttr(grb.GRB.Attr.ModelName)
-        self.dw_model.write(f'{model_name}.lp')
+        self.dw_model.write(f"{model_name}.lp")
 
     def report_results(self):
         obj_val = self.dw_model.getAttr(grb.GRB.Attr.ObjVal)
 
-        logging.info("** Final results using Dantzig-Wolfe formulation of standalone model! **")
+        logging.info(
+            "** Final results using Dantzig-Wolfe formulation of standalone model! **"
+        )
         logging.info("Objective value: %f", obj_val)
 
         machine_to_tasks: Dict[int, Set[int]] = dict()
@@ -45,7 +49,7 @@ class DantzigWolfeFormulationGapStandaloneModel:
             tasks = machine_to_tasks[machine]
             logging.info(f'{machine}\t{" ".join([str(task) for task in tasks])}')
 
-        logging.info('')
+        logging.info("")
 
     def _get_machine_schedule(self, var: grb.Var) -> TMachineSchedule:
         idx = self.machine_schedule_idx_to_variable.inverse.get(var)

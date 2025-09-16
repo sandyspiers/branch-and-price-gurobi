@@ -18,10 +18,12 @@ class BranchNode:
 
     next_node_id = itertools.count(start=0)
 
-    def __init__(self,
-                 gap_instance: GeneralAssignmentProblem,
-                 branching_rules: List[BranchingRule],
-                 machine_schedules: List[TMachineSchedule]):
+    def __init__(
+        self,
+        gap_instance: GeneralAssignmentProblem,
+        branching_rules: List[BranchingRule],
+        machine_schedules: List[TMachineSchedule],
+    ):
 
         self.id = next(self.next_node_id)
 
@@ -34,7 +36,7 @@ class BranchNode:
         self.machine_to_assignment_constraint: Dict = dict()
         self.task_to_assignment_constraint: Dict = dict()
 
-        self._rmp = grb.Model(f'GAP_RMP_{self.id}')
+        self._rmp = grb.Model(f"GAP_RMP_{self.id}")
         self._init_model(machine_schedules)
 
     def _init_model(self, machine_schedules: List[TMachineSchedule]):
@@ -69,7 +71,9 @@ class BranchNode:
         """
         machine_task_to_value = defaultdict(lambda: 0)
         # improve
-        machine_schedule_index_to_variable = bidict(self.machine_schedule_index_to_variable)
+        machine_schedule_index_to_variable = bidict(
+            self.machine_schedule_index_to_variable
+        )
 
         for var in self._rmp.getVars():
             if is_non_zero(var.x):
@@ -90,10 +94,11 @@ class BranchNode:
         self._solve_using_column_generation()
 
     def objective_value(self) -> float:
-        return \
-            self._rmp.getAttr(grb.GRB.Attr.ObjVal) \
-            if has_solution(self._rmp.status) \
-            else float('nan')
+        return (
+            self._rmp.getAttr(grb.GRB.Attr.ObjVal)
+            if has_solution(self._rmp.status)
+            else float("nan")
+        )
 
     def get_machine_schedules(self):
         return list(self.machine_schedule_index.values())
@@ -106,9 +111,9 @@ class BranchNode:
 
         for var in self._rmp.getVars():
             if is_non_zero(var.x):
-                logging.info(f'{var.VarName} \t:{var.X}')
+                logging.info(f"{var.VarName} \t:{var.X}")
 
-        logging.info('')
+        logging.info("")
 
     def report_integer_solution(self):
         obj_val = self.objective_value()
@@ -116,7 +121,9 @@ class BranchNode:
         logging.info(f"** Integral solution to RMP on node {self.id}! **")
         logging.info("Objective value: %f", obj_val)
 
-        machine_schedule_index_to_variable = bidict(self.machine_schedule_index_to_variable)
+        machine_schedule_index_to_variable = bidict(
+            self.machine_schedule_index_to_variable
+        )
         machine_to_tasks: Dict[int, Collection[int]] = defaultdict(set)
         for var in self._rmp.getVars():
             if is_non_zero(var.x):
@@ -132,7 +139,7 @@ class BranchNode:
             tasks = machine_to_tasks[machine]
             logging.info(f'{machine}\t{" ".join([str(task) for task in tasks])}')
 
-        logging.info('')
+        logging.info("")
 
     def _solve_using_column_generation(self):
         logging.info("[CG] Solving GAP using column generation")
@@ -148,22 +155,34 @@ class BranchNode:
             col_gen_itr = next(itr_cnt)
             logging.debug("[CG] Column generation iteration ... {}".format(col_gen_itr))
             if col_gen_itr % 200 == 0:
-                logging.info("[CG] Column generation iteration %d on node %d", col_gen_itr, self.id)
-                logging.info("[CG]  * Objective value: {:.2f}".format(self._rmp.getObjective().getValue()))
+                logging.info(
+                    "[CG] Column generation iteration %d on node %d",
+                    col_gen_itr,
+                    self.id,
+                )
+                logging.info(
+                    "[CG]  * Objective value: {:.2f}".format(
+                        self._rmp.getObjective().getValue()
+                    )
+                )
 
             # solve RMP
             self._rmp.update()
-            self._rmp.write(self._rmp.ModelName + '.lp')
+            self._rmp.write(self._rmp.ModelName + ".lp")
             self._rmp.optimize()
 
             # early stop due to no progress
             if math.isclose(previous_itr_objective_value, self.objective_value()):
                 itr_with_no_progress_cnt += 1
                 if itr_with_no_progress_cnt > 50:
-                    logging.info("[CG] Stopping due to no progress."
-                                 "Iteration %d on node %d."
-                                 "The latest objective value: %.1f",
-                                 col_gen_itr, self.id, self.objective_value())
+                    logging.info(
+                        "[CG] Stopping due to no progress."
+                        "Iteration %d on node %d."
+                        "The latest objective value: %.1f",
+                        col_gen_itr,
+                        self.id,
+                        self.objective_value(),
+                    )
                     break
 
             if has_solution(self._rmp.status):
@@ -184,8 +203,12 @@ class BranchNode:
         try:
             # obtain duals associated with tasks, solution might be infeasible
             # but duals will be returned
-            task_duals = [row.Pi for _, row in self.task_to_assignment_constraint.items()]
-            machine_duals = [row.Pi for _, row in self.machine_to_assignment_constraint.items()]
+            task_duals = [
+                row.Pi for _, row in self.task_to_assignment_constraint.items()
+            ]
+            machine_duals = [
+                row.Pi for _, row in self.machine_to_assignment_constraint.items()
+            ]
         except AttributeError:
             # no dual information
             return False
@@ -194,16 +217,20 @@ class BranchNode:
 
         columns_added = False
         for machine_id in range(self.gap_instance.num_machines):
-            logging.debug("[CG]  * Solving subproblem for machine {}".format(machine_id))
+            logging.debug(
+                "[CG]  * Solving subproblem for machine {}".format(machine_id)
+            )
 
             machine_dual = machine_duals[machine_id]
 
             # building knapsack subproblem using dual information
-            subproblem = subproblem_builder.build(machine_id=machine_id,
-                                                  machine_dual=machine_dual,
-                                                  task_duals=task_duals,
-                                                  branching_rules=self.branching_rules)
-            subproblem._model.write(f'subproblem_{self.id}_{itr_cnt}_{machine_id}.lp')
+            subproblem = subproblem_builder.build(
+                machine_id=machine_id,
+                machine_dual=machine_dual,
+                task_duals=task_duals,
+                branching_rules=self.branching_rules,
+            )
+            subproblem._model.write(f"subproblem_{self.id}_{itr_cnt}_{machine_id}.lp")
             subproblem.solve()
             subproblem_objective_value = subproblem.objective_value()
 
@@ -228,7 +255,7 @@ class BranchNode:
         for task_id in range(self.gap_instance.num_tasks):
             lhs = grb.quicksum([])
             rhs = 1
-            name = f'task_assignment_{task_id}'
+            name = f"task_assignment_{task_id}"
             c = self._rmp.addConstr(lhs == rhs, name=name)
             self.task_to_assignment_constraint[task_id] = c
 
@@ -236,7 +263,7 @@ class BranchNode:
         for machine_id in range(self.gap_instance.num_machines):
             lhs = grb.quicksum([])
             rhs = 1
-            name = f'convexity_machine_{machine_id}'
+            name = f"convexity_machine_{machine_id}"
             c = self._rmp.addConstr(lhs == rhs, name=name)
             self.machine_to_assignment_constraint[machine_id] = c
 
@@ -246,8 +273,7 @@ class BranchNode:
         Then, adds initial columns which are base columns of all parent nodes.
         """
         machine_schedules = self._filter_machine_schedule_based_on_branching_rule(
-            self.branching_rules,
-            machine_schedules
+            self.branching_rules, machine_schedules
         )
 
         for machine_schedule in machine_schedules:
@@ -263,13 +289,17 @@ class BranchNode:
         :param machine_schedule: machine schedule
         """
         machine_schedule_index = next(self.next_machine_schedule_index)
-        self.machine_schedule_index[machine_schedule_index] = copy.deepcopy(machine_schedule)
+        self.machine_schedule_index[machine_schedule_index] = copy.deepcopy(
+            machine_schedule
+        )
 
         machine_id = machine_schedule[0]
         tasks = machine_schedule[1]
 
         profit = self.gap_instance.machine_schedule_profit(machine_schedule)
-        name = f"machine_{machine_id}_tasks_{'_'.join(str(task_id) for task_id in tasks)}"
+        name = (
+            f"machine_{machine_id}_tasks_{'_'.join(str(task_id) for task_id in tasks)}"
+        )
 
         c = grb.Column()
         coeff = 1.0
@@ -286,16 +316,17 @@ class BranchNode:
             obj=profit,
             vtype=grb.GRB.CONTINUOUS,
             name=name,
-            column=c
+            column=c,
         )
 
         self.machine_schedule_index_to_variable[machine_schedule_index] = var
 
     @classmethod
-    def _filter_machine_schedule_based_on_branching_rule(cls,
-                                                         branching_rules: List[BranchingRule],
-                                                         machine_schedules: List[TMachineSchedule])\
-            -> List[TMachineSchedule]:
+    def _filter_machine_schedule_based_on_branching_rule(
+        cls,
+        branching_rules: List[BranchingRule],
+        machine_schedules: List[TMachineSchedule],
+    ) -> List[TMachineSchedule]:
         """
         Filters machine schedules passed from parent nodes according to
         defined branching rules where each each schedule represents assignments of
@@ -315,7 +346,11 @@ class BranchNode:
         for machine, tasks in machine_schedules:
             legal = True
             for br in branching_rules:
-                if br.assigned is True and br.machine == machine and br.task not in tasks:
+                if (
+                    br.assigned is True
+                    and br.machine == machine
+                    and br.task not in tasks
+                ):
                     legal = False
                     break
                 if br.assigned is True and br.machine != machine and br.task in tasks:

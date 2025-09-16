@@ -33,16 +33,16 @@ class FeasibleMachineSchedulesFinder:
         assignments = self._MachineSolutionFinder(
             machine_capacity=self.gap_input.machine_capacity(machine_id),
             num_tasks=self.gap_input.num_tasks,
-            task_weights=self.gap_input.weights[machine_id]).find()
+            task_weights=self.gap_input.weights[machine_id],
+        ).find()
 
-        return [
-            (machine_id, assignment)
-            for assignment in assignments
-        ]
+        return [(machine_id, assignment) for assignment in assignments]
 
     class _MachineSolutionFinder:
 
-        def __init__(self, machine_capacity: float, num_tasks: int, task_weights: np.ndarray):
+        def __init__(
+            self, machine_capacity: float, num_tasks: int, task_weights: np.ndarray
+        ):
             self.num_tasks = num_tasks
             self.task_weights = task_weights
             self.machine_capacity = machine_capacity
@@ -54,7 +54,7 @@ class FeasibleMachineSchedulesFinder:
             assignment = []
             for task_id in range(self.num_tasks):
                 assignment.append(task_id)
-                self._find(next_task_id=task_id+1, assignment=assignment)
+                self._find(next_task_id=task_id + 1, assignment=assignment)
                 assignment.pop()
 
             return self.feasible_assignments
@@ -75,10 +75,6 @@ class FeasibleMachineSchedulesFinder:
                 assignment.pop()
 
         def is_feasible(self, assignment):
-            assignment_weights = [
-                self.task_weights[task_id]
-                for task_id in assignment
-            ]
+            assignment_weights = [self.task_weights[task_id] for task_id in assignment]
             assignment_weight = np.sum(assignment_weights)
             return assignment_weight <= self.machine_capacity
-

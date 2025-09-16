@@ -7,26 +7,18 @@ import gurobipy.gurobipy as grb
 num_machines = 2
 num_tasks = 7
 
-weights = np.array([
-    [4, 1, 2, 1, 4, 3, 8],
-    [9, 9, 8, 1, 3, 8, 7]
-])
+weights = np.array([[4, 1, 2, 1, 4, 3, 8], [9, 9, 8, 1, 3, 8, 7]])
 
-profits = np.array([
-    [6, 9, 4, 2, 10, 3, 6],
-    [4, 8, 9, 1, 7, 5, 4]
-])
+profits = np.array([[6, 9, 4, 2, 10, 3, 6], [4, 8, 9, 1, 7, 5, 4]])
 
 capacity = np.array([11, 22])
 
-initial_solution = [
-    (0, [0, 1, 2, 5]),
-    (1, [3, 4, 6])
-]
+initial_solution = [(0, [0, 1, 2, 5]), (1, [3, 4, 6])]
 
 model_type = grb.GRB.MAXIMIZE
-#model_type = grb.GRB.MINIMIZE
+# model_type = grb.GRB.MINIMIZE
 print(f"Solving MINIMIZE")
+
 
 def machine_schedule_profit(machine_schedule) -> float:
     machine_id = machine_schedule[0]
@@ -39,7 +31,7 @@ def build_task_constraints(model) -> Dict:
     for task_id in range(num_tasks):
         lhs = grb.quicksum([])
         rhs = 1
-        name = f'task_assignment_{task_id}'
+        name = f"task_assignment_{task_id}"
         c = model.addConstr(lhs == rhs, name=name)
         task_to_constraint[task_id] = c
     return task_to_constraint
@@ -50,13 +42,15 @@ def build_convexity_constraints(model) -> Dict:
     for machine_id in range(num_machines):
         lhs = grb.quicksum([])
         rhs = 1
-        name = f'convexity_machine_{machine_id}'
+        name = f"convexity_machine_{machine_id}"
         c = model.addConstr(lhs == rhs, name=name)
         machine_to_constraint[machine_id] = c
     return machine_to_constraint
 
 
-def get_column(machine_schedule, machine_to_constraint, task_to_constraint) -> grb.Column:
+def get_column(
+    machine_schedule, machine_to_constraint, task_to_constraint
+) -> grb.Column:
     machine_id = machine_schedule[0]
     tasks = machine_schedule[1]
 
@@ -83,7 +77,9 @@ def model_1():
         tasks = machine_schedule[1]
         profit = machine_schedule_profit(machine_schedule)
 
-        name = f"machine_{machine_id}_tasks_{'_'.join(str(task_id) for task_id in tasks)}"
+        name = (
+            f"machine_{machine_id}_tasks_{'_'.join(str(task_id) for task_id in tasks)}"
+        )
         column = get_column(machine_schedule, machine_to_constraint, task_to_constraint)
 
         _var = model.addVar(
@@ -92,11 +88,11 @@ def model_1():
             obj=profit,
             vtype=grb.GRB.CONTINUOUS,
             name=name,
-            column=column
+            column=column,
         )
 
     model.update()
-    model.write(model.ModelName + '.lp')
+    model.write(model.ModelName + ".lp")
     model.optimize()
     print(f"Model >{model.ModelName}< objective value: {model.ObjVal}")
     print(f"Model >{model.ModelName}< duals: {model.Pi}")
@@ -118,7 +114,9 @@ def model_2():
         tasks = machine_schedule[1]
         profit = machine_schedule_profit(machine_schedule)
 
-        name = f"machine_{machine_id}_tasks_{'_'.join(str(task_id) for task_id in tasks)}"
+        name = (
+            f"machine_{machine_id}_tasks_{'_'.join(str(task_id) for task_id in tasks)}"
+        )
         column = get_column(machine_schedule, machine_to_constraint, task_to_constraint)
 
         _var = model.addVar(
@@ -127,11 +125,11 @@ def model_2():
             obj=profit,
             vtype=grb.GRB.CONTINUOUS,
             name=name,
-            column=column
+            column=column,
         )
 
     model.update()
-    model.write(model.ModelName + '.lp')
+    model.write(model.ModelName + ".lp")
     model.optimize()
     print(f"Model >{model.ModelName}< objective value: {model.ObjVal}")
     print(f"Model >{model.ModelName}< duals: {model.Pi}")
@@ -149,7 +147,9 @@ def model_3():
         tasks = machine_schedule[1]
         profit = machine_schedule_profit(machine_schedule)
 
-        name = f"machine_{machine_id}_tasks_{'_'.join(str(task_id) for task_id in tasks)}"
+        name = (
+            f"machine_{machine_id}_tasks_{'_'.join(str(task_id) for task_id in tasks)}"
+        )
         column = get_column(machine_schedule, machine_to_constraint, task_to_constraint)
 
         var = model.addVar(
@@ -158,16 +158,17 @@ def model_3():
             obj=profit,
             vtype=grb.GRB.CONTINUOUS,
             name=name,
-            column=column
+            column=column,
         )
 
-        _c = model.addConstr(var <= 1.0, name=f'Upper_bound_{name}')
+        _c = model.addConstr(var <= 1.0, name=f"Upper_bound_{name}")
 
     model.update()
-    model.write(model.ModelName + '.lp')
+    model.write(model.ModelName + ".lp")
     model.optimize()
     print(f"Model >{model.ModelName}< objective value: {model.ObjVal}")
     print(f"Model >{model.ModelName}< duals: {model.Pi}")
+
 
 model_1()
 model_2()

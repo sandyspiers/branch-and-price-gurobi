@@ -1,7 +1,10 @@
-from .gap_standalone_model_lp_relaxation import  GAPStandaloneModelLpRelaxation
+from .gap_standalone_model_lp_relaxation import GAPStandaloneModelLpRelaxation
 from .gap_standalone_model_builder import GAPStandaloneModelBuilder
 from .gap_standalone_model import GAPStandaloneModel
 from .feasible_machine_schedules_finder import FeasibleMachineSchedulesFinder
-from .dantzig_wolfe_formulation_gap_standalone_model import DantzigWolfeFormulationGapStandaloneModel
-from .dantzig_wolfe_formulation_gap_standalone_model_lp_relaxation import \
-    DantzigWolfeFormulationGapStandaloneModelLpRelaxation
+from .dantzig_wolfe_formulation_gap_standalone_model import (
+    DantzigWolfeFormulationGapStandaloneModel,
+)
+from .dantzig_wolfe_formulation_gap_standalone_model_lp_relaxation import (
+    DantzigWolfeFormulationGapStandaloneModelLpRelaxation,
+)

@@ -6,7 +6,9 @@ from bidict import bidict
 from common import TMachineSchedule
 from input_data import GeneralAssignmentProblem
 from standalone_model import FeasibleMachineSchedulesFinder
-from standalone_model.dantzig_wolfe_formulation_gap_standalone_model import DantzigWolfeFormulationGapStandaloneModel
+from standalone_model.dantzig_wolfe_formulation_gap_standalone_model import (
+    DantzigWolfeFormulationGapStandaloneModel,
+)
 
 
 class DantzigWolfeFormulationGapStandaloneModelBuilder:
@@ -20,7 +22,9 @@ class DantzigWolfeFormulationGapStandaloneModelBuilder:
         self.dw_model.setAttr(grb.GRB.Attr.ModelSense, grb.GRB.MAXIMIZE)
 
     def build(self) -> DantzigWolfeFormulationGapStandaloneModel:
-        self.feasible_machine_schedules = FeasibleMachineSchedulesFinder(self._gap_instance).find()
+        self.feasible_machine_schedules = FeasibleMachineSchedulesFinder(
+            self._gap_instance
+        ).find()
 
         self._build_columns()
         self._build_convexity_constraints()
@@ -31,7 +35,9 @@ class DantzigWolfeFormulationGapStandaloneModelBuilder:
         return DantzigWolfeFormulationGapStandaloneModel(
             dw_model=self.dw_model,
             feasible_machine_schedules=self.feasible_machine_schedules,
-            machine_schedule_idx_to_variable=bidict(self.machine_schedule_idx_to_variable)
+            machine_schedule_idx_to_variable=bidict(
+                self.machine_schedule_idx_to_variable
+            ),
         )
 
     def _build_columns(self):
@@ -52,22 +58,30 @@ class DantzigWolfeFormulationGapStandaloneModelBuilder:
 
     def _build_convexity_constraints(self):
         for machine_id in range(self._gap_instance.num_machines):
-            lhs = grb.quicksum([
-                1 * self.machine_schedule_idx_to_variable[idx]
-                for idx, machine_schedule in enumerate(self.feasible_machine_schedules)
-                if machine_schedule[0] == machine_id
-            ])
+            lhs = grb.quicksum(
+                [
+                    1 * self.machine_schedule_idx_to_variable[idx]
+                    for idx, machine_schedule in enumerate(
+                        self.feasible_machine_schedules
+                    )
+                    if machine_schedule[0] == machine_id
+                ]
+            )
             rhs = 1
-            name = f'convexity_{machine_id}'
+            name = f"convexity_{machine_id}"
             self.dw_model.addConstr(lhs == rhs, name=name)
 
     def _build_assignment_constraints(self):
         for task_id in range(self._gap_instance.num_tasks):
-            lhs = grb.quicksum([
-                1 * self.machine_schedule_idx_to_variable[idx]
-                for idx, machine_schedule in enumerate(self.feasible_machine_schedules)
-                if task_id in machine_schedule[1]
-            ])
+            lhs = grb.quicksum(
+                [
+                    1 * self.machine_schedule_idx_to_variable[idx]
+                    for idx, machine_schedule in enumerate(
+                        self.feasible_machine_schedules
+                    )
+                    if task_id in machine_schedule[1]
+                ]
+            )
             rhs = 1
-            name = f'task_assignment_{task_id}'
+            name = f"task_assignment_{task_id}"
             self.dw_model.addConstr(lhs == rhs, name=name)
