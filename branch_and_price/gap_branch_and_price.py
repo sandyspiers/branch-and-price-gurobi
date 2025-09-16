@@ -56,9 +56,11 @@ class GAPBranchAndPrice:
                     self.tree.add_edge(current_node.id, include_nd.id)
                     self.tree.add_edge(current_node.id, exclude_nd.id)
 
-        from networkx.drawing.nx_agraph import graphviz_layout
-
-        pos = graphviz_layout(self.tree, prog='dot')
+        try:
+            from networkx.drawing.nx_pydot import pydot_layout
+            pos = pydot_layout(self.tree, prog='dot')
+        except (ImportError, Exception):
+            pos = nx.spring_layout(self.tree)
         nx.draw(self.tree, pos, with_labels=True, arrows=True)
         pyplot.show()
         best_solution_node.report_integer_solution()
