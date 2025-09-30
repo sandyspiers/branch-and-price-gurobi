@@ -92,7 +92,7 @@ def model_1():
         )
 
     model.update()
-    model.write(model.ModelName + ".lp")
+    model.write("lp/" + model.ModelName + ".lp")
     model.optimize()
     print(f"Model >{model.ModelName}< objective value: {model.ObjVal}")
     print(f"Model >{model.ModelName}< duals: {model.Pi}")

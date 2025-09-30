@@ -25,7 +25,7 @@ class DantzigWolfeFormulationGapStandaloneModel:
 
     def write(self):
         model_name = self.dw_model.getAttr(grb.GRB.Attr.ModelName)
-        self.dw_model.write(f"{model_name}.lp")
+        self.dw_model.write(f"lp/{model_name}.lp")
 
     def report_results(self):
         obj_val = self.dw_model.getAttr(grb.GRB.Attr.ObjVal)

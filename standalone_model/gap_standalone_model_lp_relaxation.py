@@ -22,7 +22,7 @@ class GAPStandaloneModelLpRelaxation:
 
     def write(self):
         model_name = self._lp_relaxation.getAttr(grb.GRB.Attr.ModelName)
-        self._lp_relaxation.write(f"{model_name}.lp")
+        self._lp_relaxation.write(f"lp/{model_name}.lp")
 
     def report_results(self):
         obj_val = self._lp_relaxation.getAttr(grb.GRB.Attr.ObjVal)

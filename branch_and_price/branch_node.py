@@ -168,7 +168,7 @@ class BranchNode:
 
             # solve RMP
             self._rmp.update()
-            self._rmp.write(self._rmp.ModelName + ".lp")
+            self._rmp.write("lp/" + self._rmp.ModelName + ".lp")
             self._rmp.optimize()
 
             # early stop due to no progress
@@ -230,7 +230,9 @@ class BranchNode:
                 task_duals=task_duals,
                 branching_rules=self.branching_rules,
             )
-            subproblem._model.write(f"subproblem_{self.id}_{itr_cnt}_{machine_id}.lp")
+            subproblem._model.write(
+                f"lp/subproblem_{self.id}_{itr_cnt}_{machine_id}.lp"
+            )
             subproblem.solve()
             subproblem_objective_value = subproblem.objective_value()
 

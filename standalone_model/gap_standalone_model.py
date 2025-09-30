@@ -29,7 +29,7 @@ class GAPStandaloneModel:
 
     def write(self):
         model_name = self.mip_model.getAttr(grb.GRB.Attr.ModelName)
-        self.mip_model.write(f"{model_name}.lp")
+        self.mip_model.write(f"lp/{model_name}.lp")
 
     def report_results(self):
         obj_val = self.mip_model.getAttr(grb.GRB.Attr.ObjVal)
