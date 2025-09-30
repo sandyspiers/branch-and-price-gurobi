@@ -53,7 +53,7 @@ requires-dist = [
     { name = "bidict", specifier = "==0.21.3" },
     { name = "black", specifier = ">=25.1.0" },
     { name = "graphviz", specifier = ">=0.21" },
-    { name = "gurobipy", specifier = "==9.1.2" },
+    { name = "gurobipy", specifier = ">=10,<11" },
     { name = "matplotlib", specifier = "==3.4.3" },
     { name = "networkx", specifier = "==2.6.3" },
     { name = "numpy", specifier = "==1.21.2" },
@@ -101,13 +101,13 @@ wheels = [
 
 [[package]]
 name = "gurobipy"
-version = "9.1.2"
+version = "10.0.3"
 source = { registry = "https://pypi.org/simple" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/72/d8/2533d3ffeb7f86cd166b7953076a5449957caeb25381508d856154440277/gurobipy-9.1.2-cp39-cp39-macosx_10_11_x86_64.whl", hash = "sha256:99db82d636a910c01feb90dafd6047ad489ab1cec8be7875764f2140bcd3e9eb", size = 4431157, upload-time = "2021-04-21T11:31:35.875Z" },
-    { url = "https://files.pythonhosted.org/packages/87/87/1c936fc7fadf52648be17793592882a65186b48820714c2785829f210f68/gurobipy-9.1.2-cp39-cp39-macosx_10_9_universal2.whl", hash = "sha256:8c9b4af10e936c9bf2ae128bc65a09d52728e0b8a150addadcbf15392ec4a7e4", size = 8096060, upload-time = "2021-04-21T11:31:37.949Z" },
-    { url = "https://files.pythonhosted.org/packages/8f/81/7c0fcd5d676ea552ba2ae9898453c700d8c815fdfcfb9bc065f4a777ec6a/gurobipy-9.1.2-cp39-cp39-manylinux1_x86_64.whl", hash = "sha256:b207e85954e8ffc59a8cefe3531c6cf7e230cd778ed08b9c6f625a25acb267d8", size = 11037191, upload-time = "2021-04-21T11:31:41.371Z" },
-    { url = "https://files.pythonhosted.org/packages/74/1c/91af1f4d73f07cab092ccc3f333ceda9563f1b5935808ba5330616034cc1/gurobipy-9.1.2-cp39-cp39-win_amd64.whl", hash = "sha256:264a154baafee64913dc814bf057a5a542b6f8d90dbf4a0ab5f69a55acc105a0", size = 8578201, upload-time = "2021-04-21T11:31:43.914Z" },
+    { url = "https://files.pythonhosted.org/packages/dc/60/331a71684f0d0d733518b8178e4e9701d7e182efd7d8a93db7779bb2bfe2/gurobipy-10.0.3-cp39-cp39-macosx_10_9_universal2.whl", hash = "sha256:4fe0419554897022478cceb414bf8b3fba91806bdd8ba227d3edecdf8d90720a", size = 10290562, upload-time = "2023-09-12T01:40:04.735Z" },
+    { url = "https://files.pythonhosted.org/packages/30/55/736ec76cd889d3b6242e0c8b27bfff7e955b7a6b4ed94e67e8efa5b37ba5/gurobipy-10.0.3-cp39-cp39-manylinux2014_aarch64.whl", hash = "sha256:01bf7e756bf44373900b7f1fe410cd12df346708abd58a0f3af51a605a714a35", size = 25046520, upload-time = "2023-09-12T01:40:24.882Z" },
+    { url = "https://files.pythonhosted.org/packages/85/f3/686cc9cc6e390ead8ed29aef19a2a8b58c5ac1110d053cbf067f3073ec98/gurobipy-10.0.3-cp39-cp39-manylinux2014_x86_64.whl", hash = "sha256:bea65f0b0edcd40a0e6bdf6a468a3a92195dd6ca7fa588200ec169610275f273", size = 12801892, upload-time = "2023-09-12T01:40:37.122Z" },
+    { url = "https://files.pythonhosted.org/packages/b0/3a/0750c58d6dedde8213d1174dd4048e8b11f74c846e83c2c2c5c77ec75c11/gurobipy-10.0.3-cp39-cp39-win_amd64.whl", hash = "sha256:8a6eb953435c03b998cf3d56e57ea8b50cc5eea2a2aac2b2326416b921ca044a", size = 9726442, upload-time = "2023-09-12T01:40:45.745Z" },
 ]
 
 [[package]]

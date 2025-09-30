@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.9,<3.10"
 dependencies = [
-    "gurobipy==9.1.2",
+    "gurobipy>=10,<11",
     "numpy==1.21.2",
     "bidict==0.21.3",
     "networkx==2.6.3",
